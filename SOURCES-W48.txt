@@ -1,0 +1,16 @@
+Week 2026-W48 (23/11 – 29/11 2026)
+
+ICA:
+- Flyer: https://reklamblad.dinareklamblad.se/LP/ica-annonser
+- Store offers (example): https://www.ica.se/erbjudanden/
+
+Willys:
+- https://www.willys.se/erbjudanden
+
+Lidl:
+- Plus (app only, no public product list): https://www.lidl.se/c/lidl-plus-erbjudanden/s10017715
+- Digital flyer: https://dinareklamblad.se/lidl-annonser
+- Period: Mån 23/11 – Sön 29/11 2026
+
+Note: Lidl Plus and ICA national flyers are image-based.
+Structured import works best from Excel/CSV or store-specific offer pages (ICA butik / Willys API).

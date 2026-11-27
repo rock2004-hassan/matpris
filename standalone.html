@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MatPris – مات بريس | قارن أسعار الطعام</title>
+<style>
+  :root { --bg:#f1f5f9; --card:#fff; --text:#0f172a; --muted:#64748b; --primary:#2563eb; --ok:#059669; --warn:#d97706; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  [dir="ltr"] { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { background:var(--card); border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:20; box-shadow:0 1px 3px rgb(0 0 0/0.06); }
+  .wrap { max-width:720px; margin:0 auto; padding:12px 16px; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  h1 { margin:0; font-size:1.25rem; }
+  .tag { font-size:0.75rem; color:var(--muted); margin:2px 0 0; }
+  select, input, button { font:inherit; }
+  select { border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; background:#fff; }
+  .btn { background:var(--primary); color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-weight:600; position:relative; }
+  .btn:hover { background:#1d4ed8; }
+  .btn-ghost { background:transparent; border:1px solid #e2e8f0; color:var(--text); }
+  .btn-sm { padding:6px 10px; font-size:0.875rem; }
+  .badge { position:absolute; top:-8px; inset-inline-end:-8px; background:#ef4444; color:#fff; font-size:11px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  main { max-width:720px; margin:0 auto; padding:20px 16px 40px; }
+  label { display:block; font-size:0.875rem; font-weight:500; margin-bottom:6px; color:#334155; }
+  .search { width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:14px 16px; font-size:1.1rem; box-shadow:0 1px 2px rgb(0 0 0/0.04); }
+  .search:focus { outline:2px solid var(--primary); outline-offset:2px; }
+  .card { background:var(--card); border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin-bottom:12px; transition:box-shadow .15s; }
+  .card:hover { box-shadow:0 8px 20px -6px rgb(0 0 0/0.1); }
+  .card h3 { margin:0 0 4px; font-size:1rem; }
+  .meta { font-size:0.8125rem; color:var(--muted); }
+  .price-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+  .price { font-size:1.15rem; font-weight:700; color:var(--ok); }
+  .offer { font-size:0.7rem; background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:999px; }
+  .store-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-inline-end:4px; vertical-align:middle; }
+  .flex-between { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+  .expand { margin-top:14px; padding-top:14px; border-top:1px solid #f1f5f9; }
+  .grid2 { display:grid; gap:8px; grid-template-columns:1fr; }
+  @media(min-width:480px){ .grid2 { grid-template-columns:1fr 1fr; } }
+  .store-btn { text-align:start; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; background:#fff; cursor:pointer; width:100%; }
+  .store-btn:hover { border-color:#93c5fd; }
+  .store-btn.best { border-color:#34d399; background:#ecfdf5; }
+  .store-btn .top { display:flex; justify-content:space-between; font-weight:600; }
+  .store-btn .sub { font-size:0.75rem; color:var(--muted); margin-top:4px; }
+  .empty { text-align:center; color:var(--muted); padding:48px 16px; }
+  .total-box { background:var(--card); border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-top:16px; display:flex; justify-content:space-between; align-items:center; font-size:1.15rem; font-weight:700; }
+  .qty { display:flex; align-items:center; gap:4px; }
+  .qty button { width:32px; height:32px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; cursor:pointer; }
+  .link { color:var(--primary); text-decoration:none; font-size:0.875rem; }
+  .link:hover { text-decoration:underline; }
+  .danger { color:#dc2626; border:1px solid #fecaca; background:#fff; width:100%; border-radius:12px; padding:10px; margin-top:12px; cursor:pointer; }
+  .danger:hover { background:#fef2f2; }
+  footer { text-align:center; font-size:0.75rem; color:#94a3b8; padding:24px 16px; }
+  .admin-box { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px; }
+  .admin-box h2 { margin:0 0 12px; font-size:1rem; }
+  .admin-row { display:flex; flex-direction:column; gap:8px; }
+  @media(min-width:560px){ .admin-row { flex-direction:row; } }
+  .admin-row input { flex:1; border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; }
+  .note { background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:12px 14px; font-size:0.8125rem; color:#92400e; margin-bottom:16px; }
+  .hidden { display:none !important; }
+  .msg { color:var(--ok); font-size:0.875rem; font-weight:600; margin-top:8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap row">
+    <div>
+      <h1 id="appName">مات بريس</h1>
+      <p class="tag" id="tagline">قارن أسعار الطعام – إيكا، ويليز، ليدل وماتفارلدن</p>
+    </div>
+    <div class="row" style="gap:8px">
+      <select id="langSelect" aria-label="Language">
+        <option value="ar">العربية</option>
+        <option value="sv">Svenska</option>
+      </select>
+      <button class="btn btn-sm" id="cartBtn" type="button">السلة</button>
+      <button class="btn btn-ghost btn-sm" id="adminBtn" type="button">إدارة</button>
+      <button class="btn btn-ghost btn-sm hidden" id="homeBtn" type="button">الرئيسية</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- SEARCH VIEW -->
+  <section id="searchView">
+    <label id="searchHint">ابحث عن السلع واختر من القائمة</label>
+    <input class="search" id="searchInput" type="search" placeholder="اكتب بعض الحروف... مثل حليب، خبز، قهوة" autocomplete="off" />
+    <div id="results" style="margin-top:16px"></div>
+    <div id="idleHint" class="empty">
+      <p id="lastUp"></p>
+    </div>
+  </section>
+
+  <!-- CART VIEW -->
+  <section id="cartView" class="hidden">
+    <div class="row" style="margin-bottom:16px">
+      <h2 id="cartTitle" style="margin:0">السلة</h2>
+      <button class="link" id="backSearch" type="button">العودة إلى البحث</button>
+    </div>
+    <div id="cartList"></div>
+    <div id="cartEmpty" class="empty hidden">سلتك فارغة</div>
+    <div id="cartTotalBox" class="total-box hidden">
+      <span id="totalLabel">المجموع</span>
+      <span id="totalValue" style="color:var(--ok)"></span>
+    </div>
+    <button class="danger hidden" id="clearCart" type="button">إفراغ السلة</button>
+  </section>
+
+  <!-- ADMIN VIEW -->
+  <section id="adminView" class="hidden">
+    <h2 id="adminTitle" style="margin-top:0">استيراد أسبوعي للأسعار</h2>
+    <p id="adminHint" style="color:var(--muted); font-size:0.875rem"></p>
+    <div class="admin-box">
+      <h2 id="weeklyLinks">روابط الأسبوع</h2>
+      <div class="admin-row">
+        <select id="storeSelect"></select>
+        <input id="urlInput" type="url" placeholder="الصق رابط صفحة العروض" />
+        <button class="btn" id="addLinkBtn" type="button">إضافة رابط</button>
+      </div>
+      <p class="msg hidden" id="importMsg"></p>
+    </div>
+    <div class="note" id="extractNote"></div>
+    <div id="linksList"></div>
+  </section>
+</main>
+
+<footer id="footer">MatPris demo · ICA · Willys · Lidl · Matvärlden</footer>
+
+<script>
+const DATA = {"stores": [{"id": "ica", "name": "ICA", "nameAr": "إيكا", "color": "#E30613", "website": "https://www.ica.se"}, {"id": "willys", "name": "Willys", "nameAr": "ويليز", "color": "#E30613", "website": "https://www.willys.se"}, {"id": "lidl", "name": "Lidl", "nameAr": "ليدل", "color": "#0050AA", "website": "https://www.lidl.se"}, {"id": "matvarlden", "name": "Matvärlden", "nameAr": "ماتفارلدن", "color": "#2E7D32", "website": "https://www.matvarlden.se"}], "products": [{"id": "p1", "name": "Lingongrova 500g Pågen", "nameAr": "خبز لينغونغروفا 500غ باغن", "brand": "Pågen", "category": "Bröd", "categoryAr": "خبز", "unit": "500g", "prices": [{"storeId": "ica", "price": 24.9, "unitPrice": "49.80 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 19.9, "unitPrice": "39.80 kr/kg", "isOffer": true, "offerText": "Veckans erbjudande"}, {"storeId": "lidl", "price": 21.9, "unitPrice": "43.80 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "matvarlden", "price": 22.5, "unitPrice": "45.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p2", "name": "Mjölk 1,5% 1L Arla", "nameAr": "حليب 1.5% 1لتر أرلا", "brand": "Arla", "category": "Mejeri", "categoryAr": "ألبان", "unit": "1L", "prices": [{"storeId": "ica", "price": 14.95, "unitPrice": "14.95 kr/l", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 12.9, "unitPrice": "12.90 kr/l", "isOffer": true, "offerText": "2 för 24 kr"}, {"storeId": "lidl", "price": 11.9, "unitPrice": "11.90 kr/l", "isOffer": true, "offerText": "Veckans pris"}, {"storeId": "matvarlden", "price": 13.5, "unitPrice": "13.50 kr/l", "isOffer": false, "offerText": null}]}, {"id": "p3", "name": "Falukorv 800g Scan", "nameAr": "نقانق فالوكورف 800غ سكان", "brand": "Scan", "category": "Kött", "categoryAr": "لحم", "unit": "800g", "prices": [{"storeId": "ica", "price": 39.55, "unitPrice": "49.44 kr/kg", "isOffer": true, "offerText": "2 för 65 kr"}, {"storeId": "willys", "price": 34.9, "unitPrice": "43.63 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "lidl", "price": 32.9, "unitPrice": "41.13 kr/kg", "isOffer": true, "offerText": "Erbjudande"}, {"storeId": "matvarlden", "price": 36.0, "unitPrice": "45.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p4", "name": "Ägg 10-pack ICA", "nameAr": "بيض 10 قطع إيكا", "brand": "ICA", "category": "Mejeri", "categoryAr": "ألبان", "unit": "10-pack", "prices": [{"storeId": "ica", "price": 31.9, "unitPrice": "3.19 kr/st", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 28.9, "unitPrice": "2.89 kr/st", "isOffer": true, "offerText": "Veckans"}, {"storeId": "lidl", "price": 26.9, "unitPrice": "2.69 kr/st", "isOffer": true, "offerText": "Billigast"}, {"storeId": "matvarlden", "price": 29.5, "unitPrice": "2.95 kr/st", "isOffer": false, "offerText": null}]}, {"id": "p5", "name": "Gevalia Mellanrost 450g", "nameAr": "قهوة جيفاليا متوسط التحميص 450غ", "brand": "Gevalia", "category": "Kaffe", "categoryAr": "قهوة", "unit": "450g", "prices": [{"storeId": "ica", "price": 54.9, "unitPrice": "122.00 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 49.9, "unitPrice": "110.89 kr/kg", "isOffer": true, "offerText": "Veckans erbjudande"}, {"storeId": "lidl", "price": 47.9, "unitPrice": "106.44 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "matvarlden", "price": 52.0, "unitPrice": "115.56 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p6", "name": "Bananer 1kg", "nameAr": "موز 1كغ", "brand": "ICA / Willys", "category": "Frukt & Grönt", "categoryAr": "فواكه وخضار", "unit": "1kg", "prices": [{"storeId": "ica", "price": 22.9, "unitPrice": "22.90 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 18.9, "unitPrice": "18.90 kr/kg", "isOffer": true, "offerText": "Veckans pris"}, {"storeId": "lidl", "price": 16.9, "unitPrice": "16.90 kr/kg", "isOffer": true, "offerText": "Lidl-pris"}, {"storeId": "matvarlden", "price": 19.9, "unitPrice": "19.90 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p7", "name": "Smör 500g Arla", "nameAr": "زبدة 500غ أرلا", "brand": "Arla", "category": "Mejeri", "categoryAr": "ألبان", "unit": "500g", "prices": [{"storeId": "ica", "price": 52.9, "unitPrice": "105.80 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 47.9, "unitPrice": "95.80 kr/kg", "isOffer": true, "offerText": "2 för 90 kr"}, {"storeId": "lidl", "price": 44.9, "unitPrice": "89.80 kr/kg", "isOffer": true, "offerText": "Erbjudande"}, {"storeId": "matvarlden", "price": 49.0, "unitPrice": "98.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p8", "name": "Pasta Spaghetti 500g Barilla", "nameAr": "معكرونة سباغيتي 500غ باريلا", "brand": "Barilla", "category": "Skafferi", "categoryAr": "مونة", "unit": "500g", "prices": [{"storeId": "ica", "price": 18.9, "unitPrice": "37.80 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 15.9, "unitPrice": "31.80 kr/kg", "isOffer": true, "offerText": "3 för 45 kr"}, {"storeId": "lidl", "price": 14.9, "unitPrice": "29.80 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "matvarlden", "price": 16.5, "unitPrice": "33.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p9", "name": "Kycklingfilé fryst 1kg Kronfågel", "nameAr": "فيليه دجاج مجمد 1كغ كرونفوغل", "brand": "Kronfågel", "category": "Kött", "categoryAr": "لحم", "unit": "1kg", "prices": [{"storeId": "ica", "price": 99.0, "unitPrice": "99.00 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 89.9, "unitPrice": "89.90 kr/kg", "isOffer": true, "offerText": "Veckans"}, {"storeId": "lidl", "price": 84.9, "unitPrice": "84.90 kr/kg", "isOffer": true, "offerText": "Lidl-pris"}, {"storeId": "matvarlden", "price": 92.0, "unitPrice": "92.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p10", "name": "Tomat 1kg", "nameAr": "طماطم 1كغ", "brand": "Svensk / Import", "category": "Frukt & Grönt", "categoryAr": "فواكه وخضار", "unit": "1kg", "prices": [{"storeId": "ica", "price": 29.9, "unitPrice": "29.90 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 24.9, "unitPrice": "24.90 kr/kg", "isOffer": true, "offerText": "Veckans pris"}, {"storeId": "lidl", "price": 19.9, "unitPrice": "19.90 kr/kg", "isOffer": true, "offerText": "Billigast"}, {"storeId": "matvarlden", "price": 26.0, "unitPrice": "26.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p11", "name": "Ost Herrgård 28% 700g Arla", "nameAr": "جبن هيرغارد 28% 700غ أرلا", "brand": "Arla", "category": "Mejeri", "categoryAr": "ألبان", "unit": "700g", "prices": [{"storeId": "ica", "price": 79.0, "unitPrice": "112.86 kr/kg", "isOffer": true, "offerText": "79 kr/kg"}, {"storeId": "willys", "price": 74.9, "unitPrice": "107.00 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "lidl", "price": 69.9, "unitPrice": "99.86 kr/kg", "isOffer": true, "offerText": "Erbjudande"}, {"storeId": "matvarlden", "price": 76.0, "unitPrice": "108.57 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p12", "name": "Havregryn 1,5kg ICA", "nameAr": "شوفان 1.5كغ إيكا", "brand": "ICA", "category": "Skafferi", "categoryAr": "مونة", "unit": "1.5kg", "prices": [{"storeId": "ica", "price": 24.9, "unitPrice": "16.60 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 21.9, "unitPrice": "14.60 kr/kg", "isOffer": true, "offerText": "Veckans"}, {"storeId": "lidl", "price": 19.9, "unitPrice": "13.27 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "matvarlden", "price": 22.5, "unitPrice": "15.00 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p13", "name": "Apelsinjuice 1L God Morgon", "nameAr": "عصير برتقال 1لتر غود مورغون", "brand": "God Morgon", "category": "Dryck", "categoryAr": "مشروبات", "unit": "1L", "prices": [{"storeId": "ica", "price": 25.45, "unitPrice": "25.45 kr/l", "isOffer": true, "offerText": "2 för 40 kr"}, {"storeId": "willys", "price": 22.9, "unitPrice": "22.90 kr/l", "isOffer": false, "offerText": null}, {"storeId": "lidl", "price": 19.9, "unitPrice": "19.90 kr/l", "isOffer": true, "offerText": "Lidl-pris"}, {"storeId": "matvarlden", "price": 23.5, "unitPrice": "23.50 kr/l", "isOffer": false, "offerText": null}]}, {"id": "p14", "name": "Potatis 2kg ICA", "nameAr": "بطاطس 2كغ إيكا", "brand": "ICA", "category": "Frukt & Grönt", "categoryAr": "فواكه وخضار", "unit": "2kg", "prices": [{"storeId": "ica", "price": 17.95, "unitPrice": "8.98 kr/kg", "isOffer": true, "offerText": "10 kr/st (1-1.2kg)"}, {"storeId": "willys", "price": 15.9, "unitPrice": "7.95 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "lidl", "price": 14.9, "unitPrice": "7.45 kr/kg", "isOffer": true, "offerText": "Veckans"}, {"storeId": "matvarlden", "price": 16.5, "unitPrice": "8.25 kr/kg", "isOffer": false, "offerText": null}]}, {"id": "p15", "name": "Kalles Kaviar 190g", "nameAr": "كافيار كاليس 190غ", "brand": "Kalles", "category": "Skafferi", "categoryAr": "مونة", "unit": "190g", "prices": [{"storeId": "ica", "price": 32.9, "unitPrice": "173.16 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "willys", "price": 29.9, "unitPrice": "157.37 kr/kg", "isOffer": true, "offerText": "Veckans erbjudande"}, {"storeId": "lidl", "price": 27.9, "unitPrice": "146.84 kr/kg", "isOffer": false, "offerText": null}, {"storeId": "matvarlden", "price": 30.5, "unitPrice": "160.53 kr/kg", "isOffer": false, "offerText": null}]}], "lastUpdated": "2026-10-22"};
+
+const T = {
+  sv: {
+    appName: "MatPris",
+    tagline: "Jämför matpriser – ICA, Willys, Lidl & Matvärlden",
+    searchPlaceholder: "Skriv några bokstäver... t.ex. mjölk, bröd, kaffe",
+    searchHint: "Sök efter varor och välj från listan",
+    cart: "Kundvagn",
+    cartEmpty: "Din kundvagn är tom",
+    addToCart: "Lägg i kundvagn",
+    bestPrice: "Bästa pris",
+    offer: "Erbjudande",
+    total: "Totalt",
+    clearCart: "Töm kundvagn",
+    remove: "Ta bort",
+    admin: "Admin",
+    adminTitle: "Veckovis import av priser",
+    adminHint: "Klistra in länkar till erbjudandesidor. Sparas lokalt i webbläsaren.",
+    importSuccess: "Länk sparad!",
+    lastUpdated: "Senast uppdaterad",
+    noResults: "Inga resultat. Prova annat sökord.",
+    chooseStore: "Välj butik",
+    backToSearch: "Tillbaka till sök",
+    home: "Hem",
+    weeklyLinks: "Veckans länkar",
+    pasteUrl: "Klistra in URL till erbjudanden",
+    addLink: "Lägg till länk",
+    extractNote: "I denna demo sparas länkarna lokalt. För automatisk extraktion behövs server-side scraping senare.",
+    noLinks: "Inga länkar ännu",
+    products: "produkter",
+  },
+  ar: {
+    appName: "مات بريس",
+    tagline: "قارن أسعار الطعام – إيكا، ويليز، ليدل وماتفارلدن",
+    searchPlaceholder: "اكتب بعض الحروف... مثل حليب، خبز، قهوة",
+    searchHint: "ابحث عن السلع واختر من القائمة",
+    cart: "السلة",
+    cartEmpty: "سلتك فارغة",
+    addToCart: "أضف إلى السلة",
+    bestPrice: "أفضل سعر",
+    offer: "عرض",
+    total: "المجموع",
+    clearCart: "إفراغ السلة",
+    remove: "إزالة",
+    admin: "إدارة",
+    adminTitle: "استيراد أسبوعي للأسعار",
+    adminHint: "الصق روابط صفحات العروض. تُحفظ محلياً في المتصفح.",
+    importSuccess: "تم حفظ الرابط!",
+    lastUpdated: "آخر تحديث",
+    noResults: "لا توجد نتائج. جرب كلمة أخرى.",
+    chooseStore: "اختر المتجر",
+    backToSearch: "العودة إلى البحث",
+    home: "الرئيسية",
+    weeklyLinks: "روابط الأسبوع",
+    pasteUrl: "الصق رابط صفحة العروض",
+    addLink: "إضافة رابط",
+    extractNote: "في هذه النسخة تُحفظ الروابط محلياً. للاستخراج التلقائي لاحقاً يلزم scraping من الخادم.",
+    noLinks: "لا توجد روابط بعد",
+    products: "منتجات",
+  }
+};
+
+let lang = "ar";
+let view = "search";
+let selectedId = null;
+let cart = [];
+
+const CART_KEY = "matpris-cart-v1";
+const LINKS_KEY = "matpris-links-v1";
+
+function t(k) { return T[lang][k] || T.sv[k] || k; }
+function fmt(n) { return n.toFixed(2).replace(".", ",") + " kr"; }
+function getStore(id) { return DATA.stores.find(s => s.id === id); }
+function getProduct(id) { return DATA.products.find(p => p.id === id); }
+function bestPrice(p) {
+  return p.prices.reduce((b, c) => c.price < b.price ? c : b);
+}
+function loadCart() {
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch { cart = []; }
+}
+function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+function loadLinks() {
+  try { return JSON.parse(localStorage.getItem(LINKS_KEY) || "[]"); } catch { return []; }
+}
+function saveLinks(list) { localStorage.setItem(LINKS_KEY, JSON.stringify(list)); }
+
+function search(q) {
+  if (!q || q.trim().length < 1) return [];
+  const s = q.trim().toLowerCase();
+  return DATA.products.filter(p => {
+    const name = lang === "ar" ? p.nameAr : p.name;
+    return name.toLowerCase().includes(s) ||
+      p.name.toLowerCase().includes(s) ||
+      p.nameAr.includes(s) ||
+      p.brand.toLowerCase().includes(s) ||
+      (lang === "ar" ? p.categoryAr : p.category).toLowerCase().includes(s);
+  }).slice(0, 12);
+}
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.getElementById("appName").textContent = t("appName");
+  document.getElementById("tagline").textContent = t("tagline");
+  document.getElementById("searchHint").textContent = t("searchHint");
+  document.getElementById("searchInput").placeholder = t("searchPlaceholder");
+  document.getElementById("cartBtn").textContent = t("cart");
+  document.getElementById("adminBtn").textContent = t("admin");
+  document.getElementById("homeBtn").textContent = t("home");
+  document.getElementById("cartTitle").textContent = t("cart");
+  document.getElementById("backSearch").textContent = t("backToSearch");
+  document.getElementById("cartEmpty").textContent = t("cartEmpty");
+  document.getElementById("totalLabel").textContent = t("total");
+  document.getElementById("clearCart").textContent = t("clearCart");
+  document.getElementById("adminTitle").textContent = t("adminTitle");
+  document.getElementById("adminHint").textContent = t("adminHint");
+  document.getElementById("weeklyLinks").textContent = t("weeklyLinks");
+  document.getElementById("urlInput").placeholder = t("pasteUrl");
+  document.getElementById("addLinkBtn").textContent = t("addLink");
+  document.getElementById("extractNote").textContent = t("extractNote");
+  document.getElementById("lastUp").textContent =
+    t("lastUpdated") + ": " + DATA.lastUpdated + " · " + DATA.products.length + " " + t("products");
+  updateCartBadge();
+  if (view === "search") renderResults();
+  if (view === "cart") renderCart();
+  if (view === "admin") renderAdmin();
+}
+
+function updateCartBadge() {
+  const n = cart.reduce((s, i) => s + i.quantity, 0);
+  const btn = document.getElementById("cartBtn");
+  let badge = btn.querySelector(".badge");
+  if (n > 0) {
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.className = "badge";
+      btn.appendChild(badge);
+    }
+    badge.textContent = n;
+  } else if (badge) badge.remove();
+}
+
+function setView(v) {
+  view = v;
+  document.getElementById("searchView").classList.toggle("hidden", v !== "search");
+  document.getElementById("cartView").classList.toggle("hidden", v !== "cart");
+  document.getElementById("adminView").classList.toggle("hidden", v !== "admin");
+  document.getElementById("adminBtn").classList.toggle("hidden", v === "admin");
+  document.getElementById("homeBtn").classList.toggle("hidden", v !== "admin");
+  if (v === "cart") renderCart();
+  if (v === "admin") renderAdmin();
+  if (v === "search") renderResults();
+}
+
+function renderResults() {
+  const q = document.getElementById("searchInput").value;
+  const list = search(q);
+  const el = document.getElementById("results");
+  const idle = document.getElementById("idleHint");
+  idle.classList.toggle("hidden", q.length > 0);
+  if (q.length > 0 && list.length === 0) {
+    el.innerHTML = '<p class="empty">' + t("noResults") + "</p>";
+    return;
+  }
+  el.innerHTML = list.map(p => {
+    const best = bestPrice(p);
+    const st = getStore(best.storeId);
+    const name = lang === "ar" ? p.nameAr : p.name;
+    const cat = lang === "ar" ? p.categoryAr : p.category;
+    const expanded = selectedId === p.id;
+    let storesHtml = "";
+    if (expanded) {
+      const sorted = p.prices.slice().sort((a, b) => a.price - b.price);
+      storesHtml = '<div class="expand"><p class="meta" style="margin-bottom:8px;font-weight:600">' + t("chooseStore") + ":</p><div class=\"grid2\">" +
+        sorted.map(pr => {
+          const s = getStore(pr.storeId);
+          const isBest = pr.storeId === best.storeId;
+          return '<button type="button" class="store-btn' + (isBest ? " best" : "") + '" data-add="' + p.id + '" data-store="' + pr.storeId + '">' +
+            '<div class="top"><span>' + (lang === "ar" ? s.nameAr : s.name) + '</span><span>' + fmt(pr.price) + '</span></div>' +
+            '<div class="sub">' + pr.unitPrice + (pr.isOffer ? " · " + (pr.offerText || t("offer")) : "") + "</div></button>";
+        }).join("") +
+        '</div><button type="button" class="btn btn-ghost" style="width:100%;margin-top:10px" data-add="' + p.id + '">' +
+        t("bestPrice") + " (" + fmt(best.price) + ")</button></div>";
+    }
+    return '<div class="card" data-id="' + p.id + '"><div class="flex-between">' +
+      '<div style="flex:1;min-width:0"><h3>' + name + '</h3>' +
+      '<p class="meta">' + p.brand + " · " + cat + " · " + p.unit + '</p>' +
+      '<div class="price-row"><span class="price">' + fmt(best.price) + '</span>' +
+      (best.isOffer ? '<span class="offer">' + t("offer") + (best.offerText ? " · " + best.offerText : "") + '</span>' : "") +
+      '<span class="meta">@ ' + (lang === "ar" ? st.nameAr : st.name) + '</span></div></div>' +
+      '<button type="button" class="btn btn-sm" data-select="' + p.id + '">' + t("addToCart") + '</button></div>' +
+      storesHtml + "</div>";
+  }).join("");
+}
+
+function renderCart() {
+  const listEl = document.getElementById("cartList");
+  const emptyEl = document.getElementById("cartEmpty");
+  const totalBox = document.getElementById("cartTotalBox");
+  const clearBtn = document.getElementById("clearCart");
+  if (cart.length === 0) {
+    listEl.innerHTML = "";
+    emptyEl.classList.remove("hidden");
+    totalBox.classList.add("hidden");
+    clearBtn.classList.add("hidden");
+    return;
+  }
+  emptyEl.classList.add("hidden");
+  totalBox.classList.remove("hidden");
+  clearBtn.classList.remove("hidden");
+  let total = 0;
+  listEl.innerHTML = cart.map(item => {
+    const p = getProduct(item.productId);
+    if (!p) return "";
+    const pr = item.preferredStoreId
+      ? (p.prices.find(x => x.storeId === item.preferredStoreId) || bestPrice(p))
+      : bestPrice(p);
+    const st = getStore(pr.storeId);
+    const line = pr.price * item.quantity;
+    total += line;
+    const name = lang === "ar" ? p.nameAr : p.name;
+    return '<div class="card"><div class="flex-between">' +
+      '<div><h3>' + name + '</h3>' +
+      '<p class="meta">' + fmt(pr.price) + " × " + item.quantity + " = <strong>" + fmt(line) + "</strong></p>" +
+      '<p class="meta" style="margin-top:4px"><span class="store-dot" style="background:' + (st.color || "#666") + '"></span>' +
+      (lang === "ar" ? st.nameAr : st.name) +
+      (pr.isOffer ? ' <span class="offer">' + (pr.offerText || t("offer")) + '</span>' : "") +
+      '</p></div><div style="text-align:end">' +
+      '<div class="qty"><button type="button" data-qty="' + item.productId + '" data-d="-1">−</button>' +
+      '<span style="width:28px;text-align:center;font-weight:600">' + item.quantity + '</span>' +
+      '<button type="button" data-qty="' + item.productId + '" data-d="1">+</button></div>' +
+      '<button type="button" class="link" style="margin-top:8px;color:#dc2626" data-rm="' + item.productId + '">' + t("remove") + '</button>' +
+      '</div></div></div>';
+  }).join("");
+  document.getElementById("totalValue").textContent = fmt(total);
+}
+
+function renderAdmin() {
+  const sel = document.getElementById("storeSelect");
+  sel.innerHTML = DATA.stores.map(s =>
+    '<option value="' + s.id + '">' + (lang === "ar" ? s.nameAr : s.name) + "</option>"
+  ).join("");
+  const links = loadLinks();
+  const list = document.getElementById("linksList");
+  if (links.length === 0) {
+    list.innerHTML = '<p class="empty">' + t("noLinks") + "</p>";
+    return;
+  }
+  list.innerHTML = links.map(l => {
+    const st = getStore(l.storeId);
+    return '<div class="card flex-between"><div style="min-width:0"><p style="margin:0;font-weight:600">' +
+      (lang === "ar" ? st.nameAr : st.name) + '</p>' +
+      '<a class="link" href="' + l.url + '" target="_blank" rel="noopener" style="word-break:break-all">' + l.url + '</a>' +
+      '<p class="meta" style="margin-top:4px">' + new Date(l.addedAt).toLocaleString(lang === "ar" ? "ar" : "sv-SE") +
+      '</p></div><button type="button" class="link" style="color:#dc2626" data-rmlink="' + l.id + '">' + t("remove") + '</button></div>';
+  }).join("");
+}
+
+function addToCart(productId, storeId) {
+  const existing = cart.find(i => i.productId === productId);
+  if (existing) {
+    existing.quantity += 1;
+    if (storeId) existing.preferredStoreId = storeId;
+  } else {
+    cart.push({ productId, quantity: 1, preferredStoreId: storeId || null });
+  }
+  saveCart();
+  updateCartBadge();
+  selectedId = null;
+  document.getElementById("searchInput").value = "";
+  renderResults();
+}
+
+// Events
+document.getElementById("langSelect").addEventListener("change", e => {
+  lang = e.target.value;
+  applyLang();
+});
+document.getElementById("searchInput").addEventListener("input", () => {
+  selectedId = null;
+  renderResults();
+});
+document.getElementById("cartBtn").addEventListener("click", () => setView("cart"));
+document.getElementById("backSearch").addEventListener("click", () => setView("search"));
+document.getElementById("adminBtn").addEventListener("click", () => setView("admin"));
+document.getElementById("homeBtn").addEventListener("click", () => setView("search"));
+document.getElementById("clearCart").addEventListener("click", () => {
+  cart = [];
+  saveCart();
+  updateCartBadge();
+  renderCart();
+});
+document.getElementById("addLinkBtn").addEventListener("click", () => {
+  const url = document.getElementById("urlInput").value.trim();
+  if (!url) return;
+  const links = loadLinks();
+  links.unshift({
+    id: crypto.randomUUID(),
+    storeId: document.getElementById("storeSelect").value,
+    url,
+    addedAt: new Date().toISOString()
+  });
+  saveLinks(links);
+  document.getElementById("urlInput").value = "";
+  const msg = document.getElementById("importMsg");
+  msg.textContent = t("importSuccess");
+  msg.classList.remove("hidden");
+  setTimeout(() => msg.classList.add("hidden"), 2500);
+  renderAdmin();
+});
+
+document.getElementById("results").addEventListener("click", e => {
+  const sel = e.target.closest("[data-select]");
+  if (sel) {
+    selectedId = sel.getAttribute("data-select");
+    renderResults();
+    return;
+  }
+  const add = e.target.closest("[data-add]");
+  if (add) {
+    addToCart(add.getAttribute("data-add"), add.getAttribute("data-store") || null);
+  }
+});
+
+document.getElementById("cartList").addEventListener("click", e => {
+  const qty = e.target.closest("[data-qty]");
+  if (qty) {
+    const id = qty.getAttribute("data-qty");
+    const d = parseInt(qty.getAttribute("data-d"), 10);
+    const item = cart.find(i => i.productId === id);
+    if (!item) return;
+    item.quantity += d;
+    if (item.quantity <= 0) cart = cart.filter(i => i.productId !== id);
+    saveCart();
+    updateCartBadge();
+    renderCart();
+    return;
+  }
+  const rm = e.target.closest("[data-rm]");
+  if (rm) {
+    cart = cart.filter(i => i.productId !== rm.getAttribute("data-rm"));
+    saveCart();
+    updateCartBadge();
+    renderCart();
+  }
+});
+
+document.getElementById("linksList").addEventListener("click", e => {
+  const rm = e.target.closest("[data-rmlink]");
+  if (rm) {
+    const links = loadLinks().filter(l => l.id !== rm.getAttribute("data-rmlink"));
+    saveLinks(links);
+    renderAdmin();
+  }
+});
+
+// Init
+loadCart();
+applyLang();
+renderResults();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic",
+    sans-serif;
+  min-height: 100vh;
+}
+
+[dir="rtl"] {
+  font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+
+input:focus,
+button:focus-visible,
+select:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Card hover */
+.product-card:hover {
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+}

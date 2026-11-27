@@ -1,0 +1,32 @@
+name: Weekly nationwide price update
+on:
+  schedule:
+    # Every Monday 05:00 UTC ≈ 06–07 Sweden – new weekly offers
+    - cron: "0 5 * * 1"
+  workflow_dispatch: {}   # manual "Run workflow" button in GitHub
+  push:
+    paths: ["data/imports/**"]
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - name: Scrape nationwide offers (Willys, Coop, Lidl, ICA)
+        run: npm run scrape
+        continue-on-error: true
+        env:
+          COOP_SUBSCRIPTION_KEY: ${{ secrets.COOP_SUBSCRIPTION_KEY }}
+      - name: Import into products database
+        run: npm run update -- --force
+      - run: npm run build
+      - name: Commit live prices
+        run: |
+          git config user.name "matpris-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data src/data
+          git diff --cached --quiet || (git commit -m "chore: weekly nationwide prices $(date -u +%Y-%m-%d)" && git push)
